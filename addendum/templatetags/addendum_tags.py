@@ -1,9 +1,14 @@
 from django import template
-from django.template.base import TemplateSyntaxError
+from django.conf import settings
+from django.template import Context
+from django.template.loader import get_template
+from django.template.base import TemplateSyntaxError, VariableDoesNotExist
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
+from django.contrib.auth import REDIRECT_FIELD_NAME
 
 from ..models import get_cached_snippet
+from ..utils import generate_key, has_permission
 
 
 register = template.Library()
@@ -63,14 +68,22 @@ def snippet(parser, token):
     except IndexError:
         raise TemplateSyntaxError("%s tag takes at least one argument" % bits[0])
 
-    key = bits[0]
-    options = build_options(bits[1:], tag_name)
+    try:
+        if '=' in bits[0]:
+            raise IndexError
+        key = bits.pop(0)
+    except IndexError:
+        key = generate_key(token.source[0].loadname, nodelist[0].s)
+    options = build_options(bits, tag_name)
 
-    return SnippetNode(nodelist, key, **options)
+    snippet_node_cls = {
+        True: InlineSnippetNode,
+        False: SnippetNode
+    }
+    return snippet_node_cls[settings.ADDENDUM_INLINE_EDITING](nodelist, key, **options)
 
 
 class SnippetNode(template.Node):
-
     safe = False
     template = False
     language = ''
@@ -82,12 +95,13 @@ class SnippetNode(template.Node):
             setattr(self, k, template.Variable(v))
 
     def render(self, context):
-
         # Handle key as context variable or key as string
         try:
             key = self.key.resolve(context)
         except AttributeError:
             key = self.key[1:-1]
+        except VariableDoesNotExist:
+            key = self.key.var
 
         if self.language != '':
             try:
@@ -113,3 +127,27 @@ class SnippetNode(template.Node):
             return mark_safe(snippet)
 
         return conditional_escape(snippet)
+
+
+class InlineSnippetNode(SnippetNode):
+
+    def render(self, context, **kwargs):
+        tpl = get_template("addendum_inline_snippet.html")
+        context['value'] = super(InlineSnippetNode, self).render(context, **kwargs)
+        # .replace('>', '&gt;').replace('<', '&lt;')
+        context['key'] = self.key.var
+        user = context['user'] if 'user' in context else context['request'].user
+        if settings.ADDENDUM_INLINE_EDITING and has_permission(user):
+            context['inline'] = True
+        return tpl.render(Context(context))
+
+
+@register.inclusion_tag("addendum_toolbar.html", takes_context=True)
+def addendum_toolbar(context):
+    """The in-line editing toolbar and controls
+    """
+    user = context['user'] if 'user' in context else context['request'].user
+    context['REDIRECT_FIELD_NAME'] = REDIRECT_FIELD_NAME
+    if settings.ADDENDUM_INLINE_EDITING and has_permission(user):
+        context['inline'] = True
+    return context

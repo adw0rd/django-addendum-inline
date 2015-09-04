@@ -1,0 +1,109 @@
+{% load i18n %}
+
+{% if inline %}
+{% get_available_languages as LANGUAGES %}
+{% get_current_language as LANGUAGE_CODE %}
+{% url "admin:logout" as admin_logout_url %}
+{% url "logout" as logout_url %}
+<div class="addendum-toolbar">
+    <a class="toggle"><b>&laquo;</b> <span>{% trans "Addendum" %}</span></a>
+    <div class="toolbar">
+        <form action="{% url 'set_language' %}" method="post">
+            <span class="separator"></span>
+            {% csrf_token %}
+            <select name="language">
+                {% for lang in LANGUAGES %}
+                <option value="{{ lang.0 }}"{% if lang.0 == LANGUAGE_CODE %} selected=""{% endif %}>{{ lang.0 }}</option>
+                {% endfor %}
+            </select>
+        </form>
+        <span class="separator"></span>
+        <a href="{{ logout_url|default:admin_logout_url }}?{{ REDIRECT_FIELD_NAME }}={{ request.path }}">
+            {% trans "Log out" %}
+        </a>
+    </div>
+</div>
+<script type="text/javascript">
+    var cookie_name = 'addendum-toolbar';
+    var show = function (tb, flag) {
+        var toggle = tb.querySelector('b'),
+            title = tb.querySelector('span'),
+            toolbar = tb.parentNode.querySelector('.toolbar');
+        var data = {1: ['', '&laquo;'], 0: ['none', '&raquo;']}[flag];
+        toolbar.style.display = title.style.display = data[0];
+        toggle.innerHTML = data[1];
+        document.cookie = cookie_name + '=' + flag;
+    }
+    document.querySelector('.addendum-toolbar form select').addEventListener('change', function (e) {
+        e.target.parentNode.submit();
+    }, false);
+    document.querySelector('.addendum-toolbar a.toggle').addEventListener('click', function (e) {
+        var tb = e.target.parentNode;
+        show(tb, (tb.querySelector('b').innerHTML != '«') * 1);
+    }, false);
+    (function (d) {
+        // Getting from cookie flag to activate toolbar
+        var i, cookies = d.cookie.split(';'),
+            tb = d.querySelector('.addendum-toolbar');
+        for (i in cookies) {
+            if (cookies[i].indexOf(cookie_name) != -1)
+                show(tb, parseInt(cookies[i].split('=')[1]));
+        }
+    })(document);
+    var default_tinymce_options = {
+        inline: true,
+        plugins: [
+            "advlist autolink lists link image charmap print preview anchor",
+            "searchreplace visualblocks code fullscreen",
+            "insertdatetime media table contextmenu paste"
+        ],
+        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
+    }
+    var obj_update = function (obj, data) {
+        var key, result = obj;
+        for (key in data) result[key] = data[key];
+        return result;
+    }
+</script>
+<style type="text/css">
+    .addendum-toolbar {
+        position: absolute;
+        top: 5px; left: 5px;
+        z-index: 1000;
+        background-color: #fffcc3;
+        border: 1px solid #ccc;
+        padding: 3px;
+        color: #777d84;
+        border-radius: 2px;
+    }
+    .addendum-toolbar .toggle {
+        cursor: pointer;
+    }
+    .addendum-toolbar .toolbar, .addendum-toolbar .toolbar form {
+        float: right;
+    }
+    .addendum-toolbar .separator {
+        border-left: 1px solid #bbb;
+        margin: 2px 5px;
+    }
+    .addendum-inline-snippet > hint {
+        position: absolute;
+        top: 0px;
+        left: -10px;
+        background-color: #fffcc3;
+        border: 1px solid #ccc;
+        padding: 0 3px;
+        border-radius: 2px;
+        color: #777d84;
+        font-size: 16px;
+    }
+    .addendum-inline-snippet > editor {
+        width: 100%;
+    }
+    @keyframes addendum-flick {
+        0%  {color: #777d84;}
+        25% {color: green;}
+    }
+</style>
+<script src="//tinymce.cachefly.net/4.2/tinymce.min.js"></script>
+{% endif %}

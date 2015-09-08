@@ -80,7 +80,7 @@ Addendum supports in-line editing, which allows you to edit snippets directly on
 
     ADDENDUM_INLINE_EDITING = True
 
-Now used as an WYSIWYG editor TinyMCE, because it was faster and easier to use. You can change the default settings of TinyMCE into `settings.py`::
+Now used as an WYSIWYG editor TinyMCE_, because it was faster and easier to use. You can change the default settings of TinyMCE into ``settings.py``::
 
     ADDENDUM_INLINE_TINYMCE = {
         'inline': True,
@@ -127,3 +127,5 @@ License
 =======
 
 BSD licensed.
+
+.. _TinyMCE: http://www.tinymce.com/

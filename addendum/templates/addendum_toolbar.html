@@ -56,9 +56,9 @@
         for (key in data) result[key] = data[key];
         return result;
     }
-    var tinymce_init = function(key) {
+    var tinymce_init = function(key, skey) {
         tinymce.init(obj_update(default_tinymce_options, {
-            selector: '#' + key,
+            selector: '#' + skey,
             setup: function(ed) {
                 ed.on('blur', function(e) {
                     $.post(
@@ -66,11 +66,14 @@
                         {value: tinymce.activeEditor.getContent()},
                         function (response) {
                             if (response.state) {
-                                var hint = document.querySelector('#' + key).parentNode.querySelector('hint');
-                                hint.style.animationName = 'addendum-flick';
-                                hint.style.animationDuration = '2s';
-                                hint.style.animationIterationCount = 'infinite';
-                                setInterval(function () { hint.style.animation = 'none'; }, 4000);
+                                var editor = document.getElementById(skey);
+                                if (editor) {
+                                    var hint = editor.parentNode.querySelector('hint');
+                                    hint.style.animationName = 'addendum-flick';
+                                    hint.style.animationDuration = '2s';
+                                    hint.style.animationIterationCount = 'infinite';
+                                    setInterval(function () { hint.style.animation = 'none'; }, 4000);
+                                }
                             } else {
                                 alert('Unknown error: ' + response);
                             }

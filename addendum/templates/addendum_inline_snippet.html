@@ -1,15 +1,17 @@
 {% if inline %}
+{% with skey=key|slugify|cut:'-' %}
 <snippet class="addendum-inline-snippet">
     <hint>✎</hint>
-    <editor id="{{ key }}">{{ value }}</editor>
+    <editor id="{{ skey }}">{{ value }}</editor>
     <script type="text/javascript">
-    var timer_{{ key }} = setInterval(function () {
+    var timer_{{ skey }} = setInterval(function () {
         if (tinymce && default_tinymce_options)
-            clearInterval(timer_{{ key }});
-        tinymce_init('{{ key }}');
+            clearInterval(timer_{{ skey }});
+        tinymce_init('{{ key }}', '{{ skey }}');
     }, 500);
     </script>
 </snippet>
+{% endwith %}
 {% else %}
     {{ value }}
 {% endif %}

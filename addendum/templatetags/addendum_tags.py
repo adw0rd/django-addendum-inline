@@ -1,3 +1,4 @@
+import re
 import json
 
 from django import template
@@ -136,8 +137,7 @@ class InlineSnippetNode(SnippetNode):
     def render(self, context, **kwargs):
         tpl = get_template("addendum_inline_snippet.html")
         context['value'] = super(InlineSnippetNode, self).render(context, **kwargs)
-        # .replace('>', '&gt;').replace('<', '&lt;')
-        context['key'] = self.key.var
+        context['key'] = re.sub(r'[\\\'"]+', r'', self.key.var)
         user = context['user'] if 'user' in context else context['request'].user
         if settings.ADDENDUM_INLINE_EDITING and has_permission(user):
             context['inline'] = True

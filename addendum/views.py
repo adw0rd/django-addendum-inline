@@ -4,7 +4,7 @@ from django.views.generic import View
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, Http404
-from .models import Snippet
+from .models import Snippet, set_cached_snippet
 from .utils import has_permission
 
 
@@ -26,6 +26,7 @@ class InlineSaveView(View):
         )
         if not cr:
             Snippet.objects.filter(pk=snippet.pk).update(text=text)
+        set_cached_snippet(key)
         return HttpResponse(
             json.dumps({'state': True}),
             content_type="application/json"

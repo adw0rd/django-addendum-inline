@@ -50,20 +50,38 @@
                 show(tb, parseInt(cookies[i].split('=')[1]));
         }
     })(document);
-    var default_tinymce_options = {
-        inline: true,
-        plugins: [
-            "advlist autolink lists link image charmap print preview anchor",
-            "searchreplace visualblocks code fullscreen",
-            "insertdatetime media table contextmenu paste"
-        ],
-        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image"
-    }
+    var default_tinymce_options = {{ default_inline_tinymce|safe }};
     var obj_update = function (obj, data) {
         var key, result = obj;
         for (key in data) result[key] = data[key];
         return result;
     }
+    var tinymce_init = function(key) {
+        tinymce.init(obj_update(default_tinymce_options, {
+            selector: '#' + key,
+            setup: function(ed) {
+                ed.on('blur', function(e) {
+                    $.post(
+                        '{% url 'addendum:inline_save' %}?key=' + key,
+                        {value: tinymce.activeEditor.getContent()},
+                        function (response) {
+                            if (response.state) {
+                                var hint = document.querySelector('#' + key).parentNode.querySelector('hint');
+                                hint.style.animationName = 'addendum-flick';
+                                hint.style.animationDuration = '2s';
+                                hint.style.animationIterationCount = 'infinite';
+                                setInterval(function () { hint.style.animation = 'none'; }, 4000);
+                            } else {
+                                alert('Unknown error: ' + response);
+                            }
+                        }
+                    ).fail(function () {
+                        alert('Unknown error! Please see Network/Log.');
+                    });
+                });
+            }
+        }));
+     }
 </script>
 <style type="text/css">
     .addendum-toolbar {

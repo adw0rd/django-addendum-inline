@@ -73,6 +73,44 @@ Sync your database or migrate if you have `South <south.readthedocs.org/en/lates
 
 See the docs for upgrade notes.
 
+In-line mode
+============
+
+Addendum supports in-line editing, which allows you to edit snippets directly on the page, if you have the privilege to do. To use this feature is enough to activate it in ``settings.py``, log in as administrator or staff and start editing::
+
+    ADDENDUM_INLINE_EDITING = True
+
+Now used as an WYSIWYG editor TinyMCE, because it was faster and easier to use. You can change the default settings of TinyMCE into `settings.py`::
+
+    ADDENDUM_INLINE_TINYMCE = {
+        'inline': True,
+        'plugins': [
+            'advlist autolink lists link image charmap print preview anchor',
+            'searchreplace visualblocks code fullscreen',
+            'insertdatetime media table contextmenu paste'
+        ],
+        'toolbar': 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+    }
+
+Next, you insert a nameless snippets template::
+
+    {% load addendum_tags %}
+    ...
+    {% snippet safe=true %}
+        <p>Hello world!<br><span>In-line editing is cool!</span></p>
+    {% endsnippet %}
+
+And insert into the base template (before the </body>) call toolbar::
+
+    {% load addendum_tags %}<html>
+        <body>
+            ...
+            {% addendum_toolbar %}
+        </body>
+    </html>
+
+Editing content should be enjoyable!
+
 Contributing
 ============
 

@@ -1,5 +1,6 @@
+import json
+
 from django import template
-from django.conf import settings
 from django.template import Context
 from django.template.loader import get_template
 from django.template.base import TemplateSyntaxError, VariableDoesNotExist
@@ -7,6 +8,7 @@ from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 from django.contrib.auth import REDIRECT_FIELD_NAME
 
+from addendum import settings
 from ..models import get_cached_snippet
 from ..utils import generate_key, has_permission
 
@@ -150,4 +152,5 @@ def addendum_toolbar(context):
     context['REDIRECT_FIELD_NAME'] = REDIRECT_FIELD_NAME
     if settings.ADDENDUM_INLINE_EDITING and has_permission(user):
         context['inline'] = True
+        context['default_inline_tinymce'] = json.dumps(settings.ADDENDUM_INLINE_TINYMCE)
     return context

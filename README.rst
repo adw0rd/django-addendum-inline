@@ -82,6 +82,7 @@ Addendum supports in-line editing, which allows you to edit snippets directly on
 
 And add to ``urls.py`` next::
 
+    url(r'^i18n/$', 'django.views.i18n.set_language', name='set_language'),
     url(r'^addendum/', include('addendum.urls', namespace='addendum'))
 
 

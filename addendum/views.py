@@ -3,6 +3,7 @@ import json
 from django.views.generic import View
 from django.core.exceptions import PermissionDenied
 from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
 from django.http import HttpResponse, Http404
 from .models import Snippet, set_cached_snippet
 from .utils import has_permission
@@ -11,7 +12,7 @@ from .utils import has_permission
 class InlineSaveView(View):
     http_method_names = ['post']
 
-    @csrf_exempt
+    @method_decorator(csrf_exempt)
     def dispatch(self, request):
         if not has_permission(request.user):
             raise PermissionDenied

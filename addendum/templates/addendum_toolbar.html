@@ -11,7 +11,7 @@
         <form action="{% url 'set_language' %}" method="post">
             <span class="separator"></span>
             {% csrf_token %}
-            <select name="language">
+            <select name="language" style="width:50px;height:100%">
                 {% for lang in LANGUAGES %}
                 <option value="{{ lang.0 }}"{% if lang.0 == LANGUAGE_CODE %} selected=""{% endif %}>{{ lang.0 }}</option>
                 {% endfor %}

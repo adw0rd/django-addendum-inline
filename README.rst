@@ -80,6 +80,12 @@ Addendum supports in-line editing, which allows you to edit snippets directly on
 
     ADDENDUM_INLINE_EDITING = True
 
+And add to ``urls.py`` next::
+
+    url(r'^i18n/$', 'django.views.i18n.set_language', name='set_language'),
+    url(r'^addendum/', include('addendum.urls', namespace='addendum'))
+
+
 Now used as an WYSIWYG editor TinyMCE_, because it was faster and easier to use. You can change the default settings of TinyMCE into ``settings.py``::
 
     ADDENDUM_INLINE_TINYMCE = {

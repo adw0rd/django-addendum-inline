@@ -7,7 +7,8 @@ default_inline_tinymce = {
         'searchreplace visualblocks code fullscreen',
         'insertdatetime media table contextmenu paste'
     ],
-    'toolbar': 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image'
+    'toolbar': 'insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image',
+    'extended_valid_elements': 'span'
 }
 
 ADDENDUM_INLINE_EDITING = getattr(settings, 'ADDENDUM_INLINE_EDITING', True)

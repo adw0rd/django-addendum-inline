@@ -51,6 +51,7 @@
         }
     })(document);
     var default_tinymce_options = {{ default_inline_tinymce|safe }};
+    default_tinymce_options.extended_valid_elements = "span";
     var obj_update = function (obj, data) {
         var key, result = obj;
         for (key in data) result[key] = data[key];
@@ -122,8 +123,7 @@
         width: 100%;
     }
     @keyframes addendum-flick {
-        0%  {color: #777d84;}
-        25% {color: green;}
+        100% {background-color: green; color: white;}
     }
 </style>
 <script src="//tinymce.cachefly.net/4.2/tinymce.min.js"></script>
